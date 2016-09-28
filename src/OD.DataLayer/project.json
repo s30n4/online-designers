@@ -1,0 +1,29 @@
+{
+  "version": "1.0.0-*",
+
+  "dependencies": {
+    "Microsoft.EntityFrameworkCore": "1.0.1",
+    "Microsoft.EntityFrameworkCore.Relational": "1.0.1",
+    "Microsoft.EntityFrameworkCore.SqlServer": "1.0.1",
+    "Microsoft.Extensions.Configuration.Abstractions": "1.0.0",
+    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0",
+    "NETStandard.Library": "1.6.0",
+    "OD.DomainClasses": "1.0.0-*",
+    "SGE.Framework": "1.0.0-*"
+  },
+
+  "tools": {
+    "Microsoft.EntityFrameworkCore.Tools": {
+      "version": "1.0.0-preview2-final",
+      "imports": [
+        "portable-net45+win8"
+      ]
+    }
+  },
+
+  "frameworks": {
+    "netstandard1.6": {
+      "imports": "dnxcore50"
+    }
+  }
+}
