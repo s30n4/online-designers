@@ -10,8 +10,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using OD.DataLayer;
 using OD.DataLayer.Migrations;
 using OD.Presentation.Ioc;
+using SGE.Framework.Domain.Uow.Contracts;
 using StructureMap;
 
 namespace OD.Presentation
@@ -33,6 +35,13 @@ namespace OD.Presentation
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IConfigurationRoot>(provider => Configuration);
+
+            services.AddDbContext<ApplicationDbContext>(ServiceLifetime.Scoped);
+            services.AddScoped<IUnitOfWork, ApplicationDbContext>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigin",
@@ -58,7 +67,6 @@ namespace OD.Presentation
 
             services.AddSingleton(typeof(IMapper), mapper);
 
-            services.AddSingleton<IConfigurationRoot>(provider => Configuration);
 
             ServiceIoc.Ioc(services);
 

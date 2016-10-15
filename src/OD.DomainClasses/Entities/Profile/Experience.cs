@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using SGE.Framework.Domain.Entities;
 
-namespace OD.DomainClasses.Entities.Common
+namespace OD.DomainClasses.Entities.Profile
 {
+    [Table("Experiences", Schema = "Profile")]
     public class Experience : TitleStartEndTimeEntity
     {
 

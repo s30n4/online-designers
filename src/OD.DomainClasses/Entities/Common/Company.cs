@@ -7,6 +7,7 @@ using SGE.Framework.Domain.Entities;
 
 namespace OD.DomainClasses.Entities.Common
 {
+    [Table("Companies", Schema = "Common")]
     public class Company : TitleContactEntity
     {
         [ForeignKey("CountryId")]

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using SGE.Framework.Authorization;
+
 using SGE.Framework.Domain.Entities;
 
 namespace OD.DomainClasses.Entities.UM
 {
     [Table("UserTokens", Schema = "UM")]
-    public class UserToken : Entity, IUserToken
+    public class UserToken : Entity
     {
         public int OwnerUserId { get; set; }
 

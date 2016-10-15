@@ -5,6 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Configuration;
+using OD.DomainClasses.Entities.Common;
+using OD.DomainClasses.Entities.Profile;
+using OD.DomainClasses.Entities.Project;
+using OD.DomainClasses.Entities.UM;
 using SGE.Framework.Domain.Entities.Contracts;
 using SGE.Framework.Domain.Uow.Contracts;
 using SGE.Framework.Extension;
@@ -14,6 +18,31 @@ namespace OD.DataLayer
 {
     public class ApplicationDbContext : DbContext, IUnitOfWork
     {
+        #region DbSets
+
+        public virtual DbSet<City> Cities { get; set; }
+        public virtual DbSet<Company> Companies { get; set; }
+        public virtual DbSet<Country> Countries { get; set; }
+        public virtual DbSet<EducationDegree> EducationDegrees { get; set; }
+        public virtual DbSet<EducationPlace> EducationPlaces { get; set; }
+        public virtual DbSet<Favorite> Favorites { get; set; }
+        public virtual DbSet<Industry> Industries { get; set; }
+        public virtual DbSet<Province> Provinces { get; set; }
+        public virtual DbSet<Skill> Skills { get; set; }
+        public virtual DbSet<Experience> Experiences { get; set; }
+        public virtual DbSet<Hobby> Hobies { get; set; }
+        public virtual DbSet<Profile> Profiles { get; set; }
+        public virtual DbSet<ProfileFavorite> ProfileFavorites { get; set; }
+        public virtual DbSet<ProfileHobby> ProfileHobbies { get; set; }
+        public virtual DbSet<ProfileProject> ProfileProjects { get; set; }
+        public virtual DbSet<ProfileSkill> ProfileSkills { get; set; }
+        public virtual DbSet<Project> Projects { get; set; }
+        public virtual DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public virtual DbSet<AuditLog> AuditLogs { get; set; }
+        public virtual DbSet<UserToken> UserTokens { get; set; }
+
+        #endregion
+
         private readonly IConfigurationRoot _configuration;
         public ApplicationDbContext(IConfigurationRoot configuration)
         {
@@ -58,6 +87,11 @@ namespace OD.DataLayer
             base.Entry(entity).State = EntityState.Modified; // Or use ---> this.Update(entity);
         }
 
+        public void MarkAsDeleted<TEntity>(TEntity entity) where TEntity : class
+        {
+            Entry(entity).State = EntityState.Deleted;
+        }
+
         public void ExecuteSqlCommand(string query)
         {
             base.Database.ExecuteSqlCommand(query);
@@ -82,6 +116,7 @@ namespace OD.DataLayer
 
         #endregion UnitOfWork
 
+
         #region UpdateAuditFields
 
         protected virtual void ApplyAuditConcepts()
@@ -105,12 +140,16 @@ namespace OD.DataLayer
                         {
                             SetDeletionAuditProperties(entry.Entity, userId);
                         }
+                        if (entry.Entity is IApproverAudited)
+                        {
+                            SetDeletionAuditProperties(entry.Entity, userId);
+                        }
 
                         break;
 
                     case EntityState.Deleted:
                         CancelDeletionForSoftDelete(entry);
-                        SetDeletionAuditProperties(entry.Entity, userId);
+                        SetApprovedAuditProperties(entry, userId);
 
                         break;
 
@@ -123,6 +162,19 @@ namespace OD.DataLayer
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+            }
+        }
+
+        protected virtual void SetApprovedAuditProperties(EntityEntry entry, Guid? userId)
+        {
+            if (entry.Entity is IHasApproveTime)
+            {
+                entry.As<IHasApproveTime>().ApproveTime = DateTime.Now;
+            }
+
+            if (entry.Entity is IApproverOfTUserAudited)
+            {
+                entry.As<IApproverOfTUserAudited>().LastApproverUserId = userId;
             }
         }
 
@@ -162,10 +214,10 @@ namespace OD.DataLayer
 
         protected virtual void CancelDeletionForSoftDelete(EntityEntry entry)
         {
-            if (entry.Entity is ISoftDelete)
-            {
-                entry.As<ISoftDelete>().IsDeleted = true;
-            }
+            if (!(entry.Entity is ISoftDelete)) return;
+            var softDelete = (ISoftDelete)entry.Entity;
+            entry.State = EntityState.Unchanged;
+            softDelete.IsDeleted = true;
         }
 
         protected virtual void SetDeletionAuditProperties(object entityAsObj, Guid? userId)

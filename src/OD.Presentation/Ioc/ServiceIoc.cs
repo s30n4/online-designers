@@ -9,22 +9,7 @@ namespace OD.Presentation.Ioc
     {
         public static void Ioc(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(ServiceLifetime.Scoped);
-            services.AddScoped<IUnitOfWork, ApplicationDbContext>();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-          
-
-            #region Core
-
            
-
-            #endregion Core
-
-            #region Modules
-
-        
-
-            #endregion Modules
         }
     }
 }

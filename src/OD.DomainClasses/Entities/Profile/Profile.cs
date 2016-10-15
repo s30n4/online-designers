@@ -2,10 +2,12 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using OD.DomainClasses.Entities.Common;
+using SGE.Framework.Domain.Entities;
 
 namespace OD.DomainClasses.Entities.Profile
 {
-    public class Profile
+    [Table("Profiles", Schema = "Profile")]
+    public class Profile : Entity
     {
         [MaxLength(200)]
         public string DisplayName { get; set; }
